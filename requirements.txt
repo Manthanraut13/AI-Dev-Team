@@ -1,0 +1,40 @@
+# AI Dev Team plugin — v2
+# Removed from v1 web app: fastapi, uvicorn, sqlalchemy, alembic, psycopg2-binary, python-multipart
+
+# MCP server
+fastmcp
+
+# LLM + orchestration
+langchain
+langchain-groq
+langchain-community
+langchain-huggingface
+langsmith
+langgraph
+
+# Long-term memory (Qdrant)
+qdrant-client
+sentence-transformers
+
+# Structured output
+pydantic
+pydantic-settings
+
+# Search & crawl (optional)
+tavily-python
+firecrawl-py
+exa-py
+
+# GitHub automation (optional)
+gitpython
+
+# Event triggers
+watchdog
+
+# Config / utilities
+python-dotenv
+httpx
+
+# Dev / test
+pytest
+pytest-asyncio

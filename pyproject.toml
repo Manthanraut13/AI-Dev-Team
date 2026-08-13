@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-dev-team"
+version = "2.0.0"
+description = "AI Dev Team — Universal Coding Platform Plugin (FastMCP server)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp",
+    "langchain",
+    "langchain-groq",
+    "langchain-community",
+    "langchain-huggingface",
+    "langsmith",
+    "langgraph",
+    "qdrant-client",
+    "sentence-transformers",
+    "pydantic",
+    "pydantic-settings",
+    "tavily-python",
+    "firecrawl-py",
+    "exa-py",
+    "gitpython",
+    "watchdog",
+    "python-dotenv",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+
+[project.scripts]
+ai-dev-team = "plugin.server:main"
+
+[tool.setuptools.packages.find]
+include = ["plugin*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

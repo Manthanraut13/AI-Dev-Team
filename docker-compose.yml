@@ -1,0 +1,74 @@
+services:
+  backend:
+    build: ./backend
+    container_name: ai_dev_team_backend
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend:/app
+      - generated_code:/app/generated
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+    networks:
+      - ai_dev_team_network
+
+  frontend:
+    build: ./frontend
+    container_name: ai_dev_team_frontend
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    command: npm run dev
+    networks:
+      - ai_dev_team_network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai_dev_team_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aidevteam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aidevteam}
+      POSTGRES_DB: ${POSTGRES_DB:-aidevteam}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aidevteam} -d ${POSTGRES_DB:-aidevteam}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ai_dev_team_network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ai_dev_team_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - ai_dev_team_network
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  generated_code:
+
+networks:
+  ai_dev_team_network:
+    driver: bridge
