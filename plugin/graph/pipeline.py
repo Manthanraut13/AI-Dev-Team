@@ -125,7 +125,7 @@ async def _qa_and_review(backend_files: dict) -> tuple[list, dict]:
     with tempfile.TemporaryDirectory() as tmp:
         written = []
         for rel_path, content in backend_files.items():
-            p = safe_join(Path(tmp), rel_path)
+            p = Path(safe_join(Path(tmp), rel_path))
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(content, encoding="utf-8")
             written.append(p)
@@ -164,9 +164,9 @@ def confirm_scaffold(target: str, files: dict) -> list[str]:
     root = Path.cwd()
     written = []
     for rel_path, content in files.items():
-        dest = safe_join(root / target, rel_path)
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(content, encoding="utf-8")
-        written.append(str(dest))
+        dest_path = Path(safe_join(root / target, rel_path))
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        dest_path.write_text(content, encoding="utf-8")
+        written.append(str(dest_path))
     log_activity("pipeline", "confirm_scaffold", {"target": target, "files": len(written)})
     return written
