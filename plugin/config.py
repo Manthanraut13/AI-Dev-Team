@@ -41,12 +41,12 @@ class Settings(BaseSettings):
     # Defaults match the model set proven on this machine. Agent.md lists an
     # alternative set (e.g. qwen3-coder, deepseek-r1-distill-llama-70b,
     # gemma2-9b-it) which can be enabled by setting these env vars.
-    PLANNING_MODEL: str = "llama-3.3-70b-versatile"
-    CODE_MODEL: str = "qwen/qwen3.6-27b"
+    PLANNING_MODEL: str = "openai/gpt-oss-120b"
+    CODE_MODEL: str = "openai/gpt-oss-120b"
     REVIEW_MODEL: str = "openai/gpt-oss-120b"
-    DOCS_MODEL: str = "openai/gpt-oss-20b"
-    FAST_MODEL: str = "llama-3.1-8b-instant"
-    SUPERVISOR_MODEL: str = "llama-3.3-70b-versatile"
+    DOCS_MODEL: str = "openai/gpt-oss-120b"
+    FAST_MODEL: str = "openai/gpt-oss-20b"
+    SUPERVISOR_MODEL: str = "openai/gpt-oss-120b"
 
     class Config:
         env_file = [str(p) for p in DOTENV_CANDIDATES if p.exists()]

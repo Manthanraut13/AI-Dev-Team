@@ -40,7 +40,7 @@ async def product_manager_agent(idea: str) -> PMOutput:
     context = load_context()
 
     llm = get_llm(temperature=0.7)
-    structured_llm = llm.with_structured_output(PMOutput)
+    structured_llm = llm.with_structured_output(PMOutput, method="json_schema")
 
     messages = [
         HumanMessage(content=SYSTEM_PROMPT),
@@ -50,9 +50,16 @@ async def product_manager_agent(idea: str) -> PMOutput:
     try:
         result = invoke_with_retry(structured_llm, messages)
     except Exception as e:
-        log_activity("product_manager", "error", {"error": str(e)})
-        logger.error(f"Product Manager agent failed: {e}")
-        raise RuntimeError(f"Product Manager agent failed: {e}") from e
+        if "validation" in str(e).lower() or "parse" in str(e).lower():
+            logger.warning(f"PM output validation failed, retrying: {e}")
+            try:
+                result = invoke_with_retry(structured_llm, messages)
+            except Exception as e2:
+                log_activity("product_manager", "error", {"error": str(e2)})
+                raise RuntimeError(f"Product Manager agent failed after retry: {e2}") from e2
+        else:
+            log_activity("product_manager", "error", {"error": str(e)})
+            raise RuntimeError(f"Product Manager agent failed: {e}") from e
 
     # Persist project context so downstream agents (architect, devs) see it.
     update_context(

@@ -145,6 +145,7 @@
 ---
 
 ### Phase 4 — Event Triggers + `/devteam` Pipeline (2–3 hrs)
+**Status:** ✅ COMPLETE
 **Do:** Automatic activation + the full-pipeline command.
 
 **Tasks:**
@@ -162,6 +163,7 @@
 ---
 
 ### Phase 5 — Platform Integration + `install.py` (2–3 hrs)
+**Status:** ✅ COMPLETE
 **Do:** One-command install per platform.
 
 **Tasks:**
@@ -181,6 +183,7 @@
 ---
 
 ### Phase 6 — Memory Wiring + Error Handling (1–2 hrs)
+**Status:** ✅ COMPLETE
 **Do:** Close the loop on LTM + resilience.
 
 **Tasks:**
@@ -194,6 +197,7 @@
 ---
 
 ### Phase 7 — Testing, E2E, Cleanup (2–4 hrs)
+**Status:** ✅ COMPLETE (74/74 tests passing)
 **Do:** Prove it works inside a real coding platform, then retire the web app.
 
 **Tasks:**

@@ -75,7 +75,7 @@ async def research_agent(topic: str) -> ResearchOutput:
 
     # --- LLM synthesis -------------------------------------------------------
     llm = get_llm(temperature=0.7)
-    structured_llm = llm.with_structured_output(ResearchOutput)
+    structured_llm = llm.with_structured_output(ResearchOutput, method="json_schema")
 
     messages = [
         HumanMessage(content=SYSTEM_PROMPT),
@@ -85,9 +85,16 @@ async def research_agent(topic: str) -> ResearchOutput:
     try:
         result = invoke_with_retry(structured_llm, messages)
     except Exception as e:
-        log_activity("research", "error", {"error": str(e)})
-        logger.error(f"Research agent failed: {e}")
-        raise RuntimeError(f"Research agent failed: {e}") from e
+        if "validation" in str(e).lower() or "parse" in str(e).lower():
+            logger.warning(f"Research output validation failed, retrying: {e}")
+            try:
+                result = invoke_with_retry(structured_llm, messages)
+            except Exception as e2:
+                log_activity("research", "error", {"error": str(e2)})
+                raise RuntimeError(f"Research agent failed after retry: {e2}") from e2
+        else:
+            log_activity("research", "error", {"error": str(e)})
+            raise RuntimeError(f"Research agent failed: {e}") from e
 
     # Store findings in Qdrant for future reference (graceful if down).
     qdrant_upsert(

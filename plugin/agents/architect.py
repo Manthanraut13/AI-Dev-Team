@@ -70,7 +70,7 @@ async def architect_agent(requirements: Optional[List[str]] = None) -> Architect
         logger.info(f"Found {len(past)} relevant past architectures")
 
     llm = get_llm(temperature=0.7)
-    structured_llm = llm.with_structured_output(ArchitectOutput)
+    structured_llm = llm.with_structured_output(ArchitectOutput, method="json_schema")
 
     requirements_text = "\n".join(f"- {r}" for r in reqs)
     messages = [
@@ -84,9 +84,17 @@ async def architect_agent(requirements: Optional[List[str]] = None) -> Architect
     try:
         result = invoke_with_retry(structured_llm, messages)
     except Exception as e:
-        log_activity("architect", "error", {"error": str(e)})
-        logger.error(f"Architect agent failed: {e}")
-        raise RuntimeError(f"Architect agent failed: {e}") from e
+        if "validation" in str(e).lower() or "parse" in str(e).lower():
+            # LLM produced malformed output — retry once more with a reminder
+            logger.warning(f"Architect output validation failed, retrying: {e}")
+            try:
+                result = invoke_with_retry(structured_llm, messages)
+            except Exception as e2:
+                log_activity("architect", "error", {"error": str(e2)})
+                raise RuntimeError(f"Architect agent failed after retry: {e2}") from e2
+        else:
+            log_activity("architect", "error", {"error": str(e)})
+            raise RuntimeError(f"Architect agent failed: {e}") from e
 
     architecture = {
         "api_endpoints": result.api_endpoints,
