@@ -190,7 +190,7 @@ class TestMCPServer:
         """Test that the MCP tool returns a dict (not a Pydantic model)."""
         from plugin.server import mcp
 
-        with patch("plugin.server.product_manager_agent") as mock_pm:
+        with patch("plugin.agents.product_manager.product_manager_agent") as mock_pm:
             from plugin.schemas.outputs import PMOutput
             mock_pm.return_value = PMOutput(
                 project_name="Test",

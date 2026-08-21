@@ -1,85 +1,41 @@
-# ============================================================
-# AI Dev Team v2 — plugin .gitignore
-# ============================================================
+# AI Dev Team v2 — Plugin
 
-# ---- Python ----
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-*.pyd
-.Python
 *.egg-info/
-*.egg
-.eggs/
 dist/
 build/
-pip-wheel-metadata/
-htmlcov/
-.tox/
-.nox/
-.mypy_cache/
-.ruff_cache/
-.pyre/
-.pyright/
+.eggs/
 
-# Virtualenvs
+# Virtualenv
+.venv/
 venv/
 env/
-.venv/
-ENV/
-env.bak/
-venv.bak/
 
-# ---- Node / Next.js (v1 frontend leftover) ----
-node_modules/
-.next/
-out/
-.npm/
-.eslintcache
-.parcel-cache/
-.turbo/
-.yarn/
-
-# ---- Environment & secrets ----
+# Environment & secrets
 .env
 .env.local
 .env.*.local
-.envrc
 
-# ---- IDEs & editors ----
+# IDEs
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.settings/
 
-# ---- OS ----
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
-ehthumbs.db
-$RECYCLE.BIN/
 
-# ---- Testing & coverage ----
+# Testing
 .pytest_cache/
 .coverage
-.coverage.*
 coverage.xml
-.nyc_output/
-junit*.xml
 
-# ---- Logs ----
+# Logs
 *.log
-logs/
-*.pid
-*.seed
 
-# ---- Plugin runtime artifacts (.ai-devteam/) ----
-# config.toml and the tree itself are tracked; the volatile subdirs are not.
+# Plugin runtime artifacts
 .ai-devteam/logs/
 .ai-devteam/docs/
 .ai-devteam/research/
@@ -87,64 +43,11 @@ logs/
 .ai-devteam/tests/
 .ai-devteam/cache/
 .ai-devteam/tmp/
-.ai-devteam/sessions/
-.ai-devteam/*.pid
-.ai-devteam/*.lock
 
-# ---- Local short-term memory / scratch ----
-project_context.json
-project_context.local.json
-
-# ---- Generated code (v1 backend output, kept on disk for now per IMPLEMENTATION_PLAN) ----
-backend/generated/
-frontend/generated/
-generated/
-
-# ---- Qdrant / vector stores ----
-.qdrant/
+# Qdrant
 qdrant_storage/
-*.qdrant
 
-# ---- LangChain / LangSmith caches ----
-.langchain/
-.langsmith/
-langchain_cache/
+# Node (if any)
+node_modules/
 
-# ---- HuggingFace model cache ----
-.cache/huggingface/
-huggingface/
-
-# ---- Docker ----
-.docker/
-
-# ---- Database ----
-*.db
-*.sqlite
-*.sqlite3
-*.sql.gz
-
-# ---- Backend runtime (v1 web-app leftovers — gated on D5) ----
-backend/__pycache__/
-backend/.pytest_cache/
-backend/.coverage
-backend/htmlcov/
-backend/app/__pycache__/
-backend/tests/__pycache__/
-backend/alembic/versions/__pycache__/
-
-# ---- Frontend runtime (v1 web-app leftovers — gated on D5) ----
-frontend/.next/
-frontend/out/
-frontend/build/
-frontend/.turbo/
-frontend/coverage/
-
-# ---- OS / misc junk ----
-*.bak
-*.tmp
-*.orig
-*.rej
-*#
-
-# ---- Waylog / claude-mem scratch (local-only) ----
 .waylog/

@@ -1,0 +1,253 @@
+{
+  "project_name": "Simple Todo App",
+  "detected_stack": [
+    "FastAPI",
+    "Python",
+    "PostgreSQL",
+    "SQLAlchemy",
+    "Alembic",
+    "Pydantic",
+    "JWT",
+    "Next.js",
+    "React",
+    "TypeScript",
+    "Tailwind CSS"
+  ],
+  "requirements": [
+    "User can register with email and password",
+    "User can log in using email and password",
+    "User can reset password via email link",
+    "Authenticated user can create a new task with title, description, due date, and assign it to a category",
+    "Authenticated user can edit any attribute of an existing task",
+    "Authenticated user can delete a task",
+    "Authenticated user can mark a task as completed or uncompleted",
+    "Authenticated user can view a list of all their tasks",
+    "Authenticated user can filter tasks by status, due date, and category",
+    "Authenticated user can create, rename, and delete task categories",
+    "Authenticated user can reorder tasks within a category",
+    "User can log out and invalidate the session"
+  ],
+  "architecture": {
+    "endpoints": [
+      {
+        "method": "POST",
+        "path": "/auth/register",
+        "description": "Create a new user account with email and password."
+      },
+      {
+        "method": "POST",
+        "path": "/auth/login",
+        "description": "Authenticate user and return JWT access/refresh tokens."
+      },
+      {
+        "method": "POST",
+        "path": "/auth/logout",
+        "description": "Invalidate current refresh token (token blacklist)."
+      },
+      {
+        "method": "POST",
+        "path": "/auth/password-reset/request",
+        "description": "Send password‑reset email with one‑time token."
+      },
+      {
+        "method": "POST",
+        "path": "/auth/password-reset/confirm",
+        "description": "Validate token and set new password."
+      },
+      {
+        "method": "GET",
+        "path": "/tasks",
+        "description": "Return paginated list of authenticated user's tasks; supports query params status, due_date, category_id for filtering."
+      },
+      {
+        "method": "POST",
+        "path": "/tasks",
+        "description": "Create a new task for the authenticated user."
+      },
+      {
+        "method": "GET",
+        "path": "/tasks/{task_id}",
+        "description": "Retrieve a single task belonging to the user."
+      },
+      {
+        "method": "PATCH",
+        "path": "/tasks/{task_id}",
+        "description": "Update any mutable field of the task (title, description, due_date, category_id, order_index)."
+      },
+      {
+        "method": "DELETE",
+        "path": "/tasks/{task_id}",
+        "description": "Delete a task."
+      },
+      {
+        "method": "POST",
+        "path": "/tasks/{task_id}/complete",
+        "description": "Mark task as completed."
+      },
+      {
+        "method": "POST",
+        "path": "/tasks/{task_id}/uncomplete",
+        "description": "Mark task as not completed."
+      },
+      {
+        "method": "POST",
+        "path": "/tasks/reorder",
+        "description": "Bulk update order_index of tasks within a category to support drag‑and‑drop reordering."
+      },
+      {
+        "method": "GET",
+        "path": "/categories",
+        "description": "List all categories for the authenticated user."
+      },
+      {
+        "method": "POST",
+        "path": "/categories",
+        "description": "Create a new category."
+      },
+      {
+        "method": "PATCH",
+        "path": "/categories/{category_id}",
+        "description": "Rename a category."
+      },
+      {
+        "method": "DELETE",
+        "path": "/categories/{category_id}",
+        "description": "Delete a category and optionally cascade delete or reassign its tasks."
+      }
+    ],
+    "tables": [
+      {
+        "table": "users",
+        "columns": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true
+          },
+          {
+            "name": "email",
+            "type": "VARCHAR(255)",
+            "unique": true
+          },
+          {
+            "name": "password_hash",
+            "type": "VARCHAR(255)"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "default": "NOW()"
+          },
+          {
+            "name": "is_active",
+            "type": "BOOLEAN",
+            "default": true
+          }
+        ]
+      },
+      {
+        "table": "password_reset_tokens",
+        "columns": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true
+          },
+          {
+            "name": "user_id",
+            "type": "UUID",
+            "foreign_key": "users.id"
+          },
+          {
+            "name": "token",
+            "type": "VARCHAR(255)",
+            "unique": true
+          },
+          {
+            "name": "expires_at",
+            "type": "TIMESTAMP"
+          }
+        ]
+      },
+      {
+        "table": "categories",
+        "columns": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true
+          },
+          {
+            "name": "user_id",
+            "type": "UUID",
+            "foreign_key": "users.id"
+          },
+          {
+            "name": "name",
+            "type": "VARCHAR(100)"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "default": "NOW()"
+          }
+        ]
+      },
+      {
+        "table": "tasks",
+        "columns": [
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true
+          },
+          {
+            "name": "user_id",
+            "type": "UUID",
+            "foreign_key": "users.id"
+          },
+          {
+            "name": "category_id",
+            "type": "UUID",
+            "foreign_key": "categories.id",
+            "nullable": true
+          },
+          {
+            "name": "title",
+            "type": "VARCHAR(200)"
+          },
+          {
+            "name": "description",
+            "type": "TEXT",
+            "nullable": true
+          },
+          {
+            "name": "due_date",
+            "type": "DATE",
+            "nullable": true
+          },
+          {
+            "name": "is_completed",
+            "type": "BOOLEAN",
+            "default": false
+          },
+          {
+            "name": "order_index",
+            "type": "INTEGER",
+            "default": 0
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "default": "NOW()"
+          },
+          {
+            "name": "updated_at",
+            "type": "TIMESTAMP",
+            "default": "NOW()"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,145 +1,128 @@
-# Architecture — Simple Todo Application
+# Architecture — Simple Todo App
 
 ## Detected Stack
 
 - FastAPI
-- Python 3.11
+- Python
 - PostgreSQL
 - SQLAlchemy
 - Alembic
-- JWT (PyJWT)
 - Pydantic
-- Docker
-- Docker Compose
+- JWT
 - Next.js
 - React
 - TypeScript
 - Tailwind CSS
-- React Query
-- Axios
 
 ## API Endpoints
 
-- **POST** `/api/auth/register` — Register a new user with email and password.
-- **POST** `/api/auth/login` — Authenticate user and return JWT access/refresh tokens.
-- **POST** `/api/auth/logout` — Invalidate refresh token (optional) to log out securely.
-- **POST** `/api/auth/password-reset/request` — Send password‑reset email with verification token.
-- **POST** `/api/auth/password-reset/confirm` — Verify token and set new password.
-- **GET** `/api/tasks` — Get paginated list of tasks for the authenticated user; supports filtering, sorting, and search via query parameters.
-- **POST** `/api/tasks` — Create a new task belonging to the authenticated user.
-- **GET** `/api/tasks/{task_id}` — Retrieve a single task detail.
-- **PUT** `/api/tasks/{task_id}` — Replace all attributes of a task.
-- **PATCH** `/api/tasks/{task_id}` — Partially update task attributes (e.g., mark complete).
-- **DELETE** `/api/tasks/{task_id}` — Delete a task owned by the user.
-- **GET** `/api/categories` — List all categories created by the user.
-- **POST** `/api/categories` — Create a new task category.
-- **PUT** `/api/categories/{category_id}` — Update category name or metadata.
-- **DELETE** `/api/categories/{category_id}` — Delete a category (optional cascade removal from tasks).
+- **POST** `/auth/register` — Create a new user account with email and password.
+- **POST** `/auth/login` — Authenticate user and return JWT access/refresh tokens.
+- **POST** `/auth/logout` — Invalidate current refresh token (token blacklist).
+- **POST** `/auth/password-reset/request` — Send password‑reset email with one‑time token.
+- **POST** `/auth/password-reset/confirm` — Validate token and set new password.
+- **GET** `/tasks` — Return paginated list of authenticated user's tasks; supports query params status, due_date, category_id for filtering.
+- **POST** `/tasks` — Create a new task for the authenticated user.
+- **GET** `/tasks/{task_id}` — Retrieve a single task belonging to the user.
+- **PATCH** `/tasks/{task_id}` — Update any mutable field of the task (title, description, due_date, category_id, order_index).
+- **DELETE** `/tasks/{task_id}` — Delete a task.
+- **POST** `/tasks/{task_id}/complete` — Mark task as completed.
+- **POST** `/tasks/{task_id}/uncomplete` — Mark task as not completed.
+- **POST** `/tasks/reorder` — Bulk update order_index of tasks within a category to support drag‑and‑drop reordering.
+- **GET** `/categories` — List all categories for the authenticated user.
+- **POST** `/categories` — Create a new category.
+- **PATCH** `/categories/{category_id}` — Rename a category.
+- **DELETE** `/categories/{category_id}` — Delete a category and optionally cascade delete or reassign its tasks.
 
 ## Database Schema
 
-### unknown
-- id: SERIAL
+### users
+- id: UUID
 - email: VARCHAR(255)
-- hashed_password: VARCHAR(255)
-- is_active: BOOLEAN
+- password_hash: VARCHAR(255)
 - created_at: TIMESTAMP
-- updated_at: TIMESTAMP
+- is_active: BOOLEAN
 
-### unknown
-- id: SERIAL
-- user_id: INTEGER
+### password_reset_tokens
+- id: UUID
+- user_id: UUID
+- token: VARCHAR(255)
+- expires_at: TIMESTAMP
+
+### categories
+- id: UUID
+- user_id: UUID
 - name: VARCHAR(100)
 - created_at: TIMESTAMP
-- updated_at: TIMESTAMP
 
-### unknown
-- id: SERIAL
-- user_id: INTEGER
+### tasks
+- id: UUID
+- user_id: UUID
+- category_id: UUID
 - title: VARCHAR(200)
 - description: TEXT
 - due_date: DATE
-- priority: INTEGER
 - is_completed: BOOLEAN
+- order_index: INTEGER
 - created_at: TIMESTAMP
 - updated_at: TIMESTAMP
-
-### unknown
-- task_id: INTEGER
-- category_id: INTEGER
-
-### unknown
-- id: SERIAL
-- user_id: INTEGER
-- reset_token: VARCHAR(255)
-- expires_at: TIMESTAMP
-- created_at: TIMESTAMP
 
 ## Folder Structure
 
 ```
 backend/
-├─ app/
-│  ├─ api/
-│  │   ├─ v1/
-│  │   │   ├─ endpoints/
-│  │   │   │   ├─ auth.py
-│  │   │   │   ├─ tasks.py
-│  │   │   │   └─ categories.py
-│  │   │   └─ dependencies.py
-│  │  ├─ core/
-│  │  │   ├─ config.py
-│  │  │   ├─ security.py
-│  │  │   └─ pagination.py
-│  │  ├─ db/
-│  │  │   ├─ base.py
-│  │  │   ├─ models.py
-│  │  │   ├─ schemas.py
-│  │  │   └─ session.py
-│  │  └─ main.py
-├─ tests/
-│   ├─ api/
-│   └─ db/
-├─ alembic/
-│   └─ ...
-├─ Dockerfile
-└─ poetry.lock
+  app/
+    api/
+      v1/
+        endpoints/
+        dependencies/
+    core/
+      config.py
+      security.py
+    db/
+      models.py
+      session.py
+    schemas/
+      auth.py
+      task.py
+      category.py
+    services/
+      auth.py
+      task.py
+      category.py
+  tests/
+    unit/
+    integration/
 frontend/
-├─ src/
-│   ├─ app/
-│   │   ├─ pages/
-│   │   │   ├─ index.tsx
-│   │   │   ├─ login.tsx
-│   │   │   └─ tasks/
-│   │   │       ├─ list.tsx
-│   │   │       └─ edit.tsx
-│   │   ├─ components/
-│   │   │   ├─ TaskCard.tsx
-│   │   │   ├─ CategorySelect.tsx
-│   │   │   └─ Layout.tsx
-│   │   ├─ hooks/
-│   │   │   └─ useAuth.ts
-│   │   ├─ services/
-│   │   │   └─ api.ts
-│   │   └─ styles/
-│   │       └─ globals.css
-│   └─ public/
-├─ tsconfig.json
-├─ next.config.js
-├─ package.json
-├─ Dockerfile
-└─ .env.local
+  src/
+    pages/
+      api/
+        auth.ts
+        tasks.ts
+        categories.ts
+    components/
+      TaskList.tsx
+      TaskItem.tsx
+      CategoryList.tsx
+    hooks/
+      useAuth.ts
+      useTasks.ts
+    styles/
+    utils/
+  public/
+    favicon.ico
+    robots.txt
+  next.config.js
+  tsconfig.json
 ```
 
 ## Technology Decisions
 
-1. Use FastAPI for its async support, automatic OpenAPI generation, and tight Pydantic integration for request/response validation.
-2. Store passwords with bcrypt hashing via Passlib; never store plain text passwords.
-3. Stateless JWT authentication enables horizontal scaling; refresh tokens are stored in HttpOnly cookies for security.
-4. SQLAlchemy ORM with Alembic migrations provides type‑safe DB access and schema versioning.
-5. Design tasks‑categories as many‑to‑many via a join table to allow flexible categorization.
-6. Implement pagination using limit/offset with configurable page size; expose total count in response headers.
-7. Expose filtering, sorting, and search through query parameters (e.g., ?category=1&status=completed&search=foo).
-8. Separate backend and frontend into distinct Docker services; use Docker Compose for local development and easy CI/CD.
-9. Frontend built with Next.js for SSR/SEO friendliness and built‑in routing; Tailwind CSS for rapid responsive UI design.
-10. React Query handles caching, background refetch, and optimistic updates for a smooth UX.
+1. FastAPI chosen for its async support, automatic OpenAPI generation and tight Pydantic integration, speeding up API development.
+2. PostgreSQL provides strong relational guarantees needed for normalized user‑task‑category relationships and supports advanced indexing for filtering.
+3. SQLAlchemy + Alembic for ORM and migrations, allowing type‑safe model definitions and versioned schema changes.
+4. JWT access/refresh token flow gives stateless authentication for scalability; refresh token revocation handled via token blacklist in Redis (optional).
+5. Next.js with React‑TypeScript gives server‑side rendering for SEO‑friendly pages and API route co‑location, while TypeScript adds compile‑time safety.
+6. Tailwind CSS for rapid UI styling without custom CSS overhead.
+7. Task ordering stored as an integer `order_index` allowing cheap reordering via bulk update; can be extended to use a linked‑list approach if needed.
+8. All endpoints are versioned under `/api/v1` to enable future backward‑compatible changes.

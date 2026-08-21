@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ai-dev-team"
 version = "2.0.0"
-description = "AI Dev Team — Universal Coding Platform Plugin (FastMCP server)"
+description = "AI Dev Team — MCP server for autonomous software development"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
