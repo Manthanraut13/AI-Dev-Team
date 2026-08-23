@@ -1,5 +1,5 @@
 # AI Dev Team plugin — v2
-# Removed from v1 web app: fastapi, uvicorn, sqlalchemy, alembic, psycopg2-binary, python-multipart
+# Optimized for Horizon (FastMCP cloud) deployment
 
 # MCP server
 fastmcp
@@ -8,13 +8,11 @@ fastmcp
 langchain
 langchain-groq
 langchain-community
-langchain-huggingface
 langsmith
 langgraph
 
 # Long-term memory (Qdrant)
 qdrant-client
-sentence-transformers
 
 # Structured output
 pydantic
@@ -27,9 +25,6 @@ exa-py
 
 # GitHub automation (optional)
 gitpython
-
-# Event triggers
-watchdog
 
 # Config / utilities
 python-dotenv

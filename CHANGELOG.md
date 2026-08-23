@@ -1,14 +1,7 @@
 ```markdown
-## [2026-08-21] - Initial release of Simple Todo App
-
+## [2026-08-23] - Added API documentation and README update
 ### Changed
-- Added full project documentation:
-  - Updated **README.md** with a direct link to the new API reference.
-  - Created **docs/API.md** containing detailed endpoint specifications, request/response examples, and error handling.
-  - Added **CHANGELOG.md** entry summarizing the release.
-- Implemented authentication flow (register, login, password reset) and JWT protection.
-- Added CRUD operations for categories and tasks, including completion toggling and filtering.
-- Integrated email sending for password‑reset via configurable SMTP.
-- Set up testing scaffolding with `pytest` and `httpx`.
-- Provided quick‑start instructions and environment configuration guidelines.
+- Introduced comprehensive **API reference** in `docs/API.md` covering authentication, category, and task endpoints with request/response examples.
+- Updated `README.md` to include a direct link to the new API documentation section.
+- Adjusted changelog to reflect the new documentation release.
 ```

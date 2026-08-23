@@ -16,6 +16,13 @@ import os
 import sys
 import time
 
+# Ensure the project root is on sys.path so `from plugin.config import ...`
+# works whether the server is started via `python -m plugin.server` (cwd is
+# the project root) or via `python plugin/server.py` from Horizon / Docker.
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 

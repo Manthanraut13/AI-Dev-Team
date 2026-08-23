@@ -7,37 +7,38 @@ Authentication is performed via **Bearer JWT** token in the `Authorization` head
 ## Authentication
 
 ### Register a new user
-`POST /api/v1/auth/register`
+**POST** `/api/v1/auth/register`
 
-**Request**
 ```json
 {
-  "email": "user@example.com",
-  "password": "StrongP@ssw0rd"
+  "email": "jane.doe@example.com",
+  "password": "StrongP@ssw0rd!"
 }
 ```
 
-**Response (201)**
+**Response (201 Created)**
 ```json
 {
   "id": 1,
-  "email": "user@example.com",
-  "created_at": "2026-08-21T12:34:56Z"
+  "email": "jane.doe@example.com",
+  "is_active": true,
+  "created_at": "2026-08-23T12:34:56Z"
 }
 ```
+
+---
 
 ### Login
-`POST /api/v1/auth/login`
+**POST** `/api/v1/auth/login`
 
-**Request**
 ```json
 {
-  "email": "user@example.com",
-  "password": "StrongP@ssw0rd"
+  "email": "jane.doe@example.com",
+  "password": "StrongP@ssw0rd!"
 }
 ```
 
-**Response (200)**
+**Response (200 OK)**
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -45,35 +46,37 @@ Authentication is performed via **Bearer JWT** token in the `Authorization` head
 }
 ```
 
-### Request password‑reset email
-`POST /api/v1/auth/password-reset/request`
+---
 
-**Request**
+### Request password‑reset email
+**POST** `/api/v1/auth/password-reset/request`
+
 ```json
 {
-  "email": "user@example.com"
+  "email": "jane.doe@example.com"
 }
 ```
 
-**Response (200)**
+**Response (200 OK)**
 ```json
 {
   "detail": "Password reset email sent if the address exists."
 }
 ```
 
-### Reset password (using token from email)
-`POST /api/v1/auth/password-reset/confirm`
+---
 
-**Request**
+### Confirm password reset
+**POST** `/api/v1/auth/password-reset/confirm`
+
 ```json
 {
   "token": "reset-token-from-email",
-  "new_password": "NewStr0ngP@ss"
+  "new_password": "NewStr0ngP@ss!"
 }
 ```
 
-**Response (200)**
+**Response (200 OK)**
 ```json
 {
   "detail": "Password has been reset successfully."
@@ -83,52 +86,53 @@ Authentication is performed via **Bearer JWT** token in the `Authorization` head
 ## Categories
 
 ### Create a category
-`POST /api/v1/categories`
+**POST** `/api/v1/categories`
 
-**Headers**
+*Headers*
 ```
 Authorization: Bearer <access_token>
 ```
 
-**Request**
 ```json
 {
   "name": "Work"
 }
 ```
 
-**Response (201)**
+**Response (201 Created)**
 ```json
 {
   "id": 3,
   "name": "Work",
   "owner_id": 1,
-  "created_at": "2026-08-21T13:00:00Z"
+  "created_at": "2026-08-23T13:00:00Z"
 }
 ```
 
-### List user categories
-`GET /api/v1/categories`
+---
 
-**Headers**
+### List categories
+**GET** `/api/v1/categories`
+
+*Headers*
 ```
 Authorization: Bearer <access_token>
 ```
 
-**Response (200)**
+**Response (200 OK)**
 ```json
 [
   {
     "id": 1,
     "name": "Personal",
     "owner_id": 1,
-    "created_at": "2026-08-20T09:15:00Z"
+    "created_at": "2026-08-22T09:15:00Z"
   },
   {
     "id": 3,
     "name": "Work",
     "owner_id": 1,
-    "created_at": "2026-08-21T13:00:00Z"
+    "created_at": "2026-08-23T13:00:00Z"
   }
 ]
 ```
@@ -136,183 +140,202 @@ Authorization: Bearer <access_token>
 ## Tasks
 
 ### Create a task
-`POST /api/v1/tasks`
+**POST** `/api/v1/tasks`
 
-**Headers**
+*Headers*
 ```
 Authorization: Bearer <access_token>
 ```
 
-**Request**
 ```json
 {
-  "title": "Buy groceries",
-  "description": "Milk, Bread, Eggs",
-  "due_date": "2026-08-25",
-  "category_id": 1
+  "title": "Finish report",
+  "description": "Complete the quarterly financial report",
+  "due_date": "2026-09-01",
+  "category_id": 3
 }
 ```
 
-**Response (201)**
+**Response (201 Created)**
 ```json
 {
   "id": 42,
-  "title": "Buy groceries",
-  "description": "Milk, Bread, Eggs",
-  "due_date": "2026-08-25",
+  "title": "Finish report",
+  "description": "Complete the quarterly financial report",
+  "due_date": "2026-09-01",
   "completed": false,
+  "category_id": 3,
   "owner_id": 1,
-  "category_id": 1,
-  "created_at": "2026-08-21T14:20:00Z",
-  "updated_at": "2026-08-21T14:20:00Z"
+  "created_at": "2026-08-23T14:20:00Z",
+  "updated_at": "2026-08-23T14:20:00Z"
 }
 ```
 
-### Get a single task
-`GET /api/v1/tasks/{task_id}`
-
-**Headers**
-```
-Authorization: Bearer <access_token>
-```
-
-**Response (200)**
-```json
-{
-  "id": 42,
-  "title": "Buy groceries",
-  "description": "Milk, Bread, Eggs",
-  "due_date": "2026-08-25",
-  "completed": false,
-  "owner_id": 1,
-  "category_id": 1,
-  "created_at": "2026-08-21T14:20:00Z",
-  "updated_at": "2026-08-21T14:20:00Z"
-}
-```
-
-### Update a task
-`PUT /api/v1/tasks/{task_id}`
-
-**Headers**
-```
-Authorization: Bearer <access_token>
-```
-
-**Request** (any subset of fields may be provided)
-```json
-{
-  "title": "Buy groceries and fruits",
-  "description": "Milk, Bread, Eggs, Apples",
-  "due_date": "2026-08-26",
-  "category_id": 2,
-  "completed": true
-}
-```
-
-**Response (200)**
-```json
-{
-  "id": 42,
-  "title": "Buy groceries and fruits",
-  "description": "Milk, Bread, Eggs, Apples",
-  "due_date": "2026-08-26",
-  "completed": true,
-  "owner_id": 1,
-  "category_id": 2,
-  "created_at": "2026-08-21T14:20:00Z",
-  "updated_at": "2026-08-21T15:05:00Z"
-}
-```
-
-### Delete a task
-`DELETE /api/v1/tasks/{task_id}`
-
-**Headers**
-```
-Authorization: Bearer <access_token>
-```
-
-**Response (204)**
-_No content_
-
-### Toggle completion status
-`POST /api/v1/tasks/{task_id}/toggle`
-
-**Headers**
-```
-Authorization: Bearer <access_token>
-```
-
-**Response (200)**
-```json
-{
-  "id": 42,
-  "completed": true,
-  "updated_at": "2026-08-21T15:10:00Z"
-}
-```
+---
 
 ### List all tasks for the authenticated user
-`GET /api/v1/tasks`
+**GET** `/api/v1/tasks`
 
-**Headers**
+*Headers*
 ```
 Authorization: Bearer <access_token>
 ```
 
-**Optional query parameters**
-- `completed` – filter by completion status (`true`/`false`)
-- `category_id` – filter by category
-- `due_before` – ISO date string to get tasks due before a date
-- `due_after` – ISO date string to get tasks due after a date
-
-**Response (200)**
+**Response (200 OK)**
 ```json
 [
   {
     "id": 42,
-    "title": "Buy groceries and fruits",
-    "description": "Milk, Bread, Eggs, Apples",
-    "due_date": "2026-08-26",
-    "completed": true,
+    "title": "Finish report",
+    "description": "Complete the quarterly financial report",
+    "due_date": "2026-09-01",
+    "completed": false,
+    "category_id": 3,
     "owner_id": 1,
-    "category_id": 2,
-    "created_at": "2026-08-21T14:20:00Z",
-    "updated_at": "2026-08-21T15:05:00Z"
+    "created_at": "2026-08-23T14:20:00Z",
+    "updated_at": "2026-08-23T14:20:00Z"
   },
   {
     "id": 43,
-    "title": "Finish report",
-    "description": "Quarterly financial report",
-    "due_date": "2026-08-30",
-    "completed": false,
+    "title": "Buy groceries",
+    "description": "Milk, eggs, bread",
+    "due_date": "2026-08-24",
+    "completed": true,
+    "category_id": 1,
     "owner_id": 1,
-    "category_id": 3,
-    "created_at": "2026-08-21T14:45:00Z",
-    "updated_at": "2026-08-21T14:45:00Z"
+    "created_at": "2026-08-22T10:05:00Z",
+    "updated_at": "2026-08-22T12:00:00Z"
   }
 ]
 ```
 
-## Error Responses
+---
 
-All error responses follow this schema:
+### Retrieve a single task
+**GET** `/api/v1/tasks/{task_id}`
 
+*Headers*
+```
+Authorization: Bearer <access_token>
+```
+
+**Response (200 OK)**
 ```json
 {
-  "detail": "Human readable error message."
+  "id": 42,
+  "title": "Finish report",
+  "description": "Complete the quarterly financial report",
+  "due_date": "2026-09-01",
+  "completed": false,
+  "category_id": 3,
+  "owner_id": 1,
+  "created_at": "2026-08-23T14:20:00Z",
+  "updated_at": "2026-08-23T14:20:00Z"
 }
 ```
 
-Typical status codes:
-- `400` – Validation error / bad request
-- `401` – Unauthorized (missing/invalid token)
-- `403` – Forbidden (accessing another user's resource)
-- `404` – Not found
-- `422` – Unprocessable Entity (FastAPI validation errors)
+---
+
+### Update a task
+**PUT** `/api/v1/tasks/{task_id}`
+
+*Headers*
+```
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "Finish annual report",
+  "description": "Include latest market analysis",
+  "due_date": "2026-09-05",
+  "category_id": 3,
+  "completed": false
+}
+```
+
+**Response (200 OK)**
+```json
+{
+  "id": 42,
+  "title": "Finish annual report",
+  "description": "Include latest market analysis",
+  "due_date": "2026-09-05",
+  "completed": false,
+  "category_id": 3,
+  "owner_id": 1,
+  "created_at": "2026-08-23T14:20:00Z",
+  "updated_at": "2026-08-23T15:10:00Z"
+}
+```
+
+---
+
+### Delete a task
+**DELETE** `/api/v1/tasks/{task_id}`
+
+*Headers*
+```
+Authorization: Bearer <access_token>
+```
+
+**Response (204 No Content)**
+_No body_
+
+---
+
+### Toggle completion status
+**PATCH** `/api/v1/tasks/{task_id}/toggle`
+
+*Headers*
+```
+Authorization: Bearer <access_token>
+```
+
+**Response (200 OK)**
+```json
+{
+  "id": 42,
+  "completed": true,
+  "updated_at": "2026-08-23T16:00:00Z"
+}
+```
+
+## Error Handling
+
+All error responses follow the JSON:API error object format.
+
+**Example – Validation error (422)**
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "email"],
+      "msg": "value is not a valid email address",
+      "type": "value_error.email"
+    }
+  ]
+}
+```
+
+**Example – Unauthorized (401)**
+```json
+{
+  "detail": "Could not validate credentials"
+}
+```
+
+**Example – Not found (404)**
+```json
+{
+  "detail": "Task not found"
+}
+```
 
 ---
 
 *All timestamps are in ISO‑8601 UTC format.*  
+*All dates (e.g., `due_date`) are in `YYYY-MM-DD` format.*  
+
 ```
