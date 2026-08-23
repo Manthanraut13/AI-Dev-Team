@@ -86,48 +86,32 @@ The agents will:
 6. **Code Reviewer** — review for issues
 7. **Documentation** — generate README, API docs
 
+## Documentation
+
+- [Full Documentation](docs/DOCUMENTATION.md) — architecture, agents, API reference
+- [Integration Guide](docs/INTEGRATION.md) — platform setup instructions
+- [Changelog](docs/CHANGELOG.md) — version history
+
 ## Project Structure
 
 ```
-plugin/
-├── server.py          # MCP server (FastMCP) — entry point
-├── config.py          # Settings (Groq keys, model names)
-├── agents/            # 8 AI agents
-│   ├── product_manager.py
-│   ├── architect.py
-│   ├── research.py
-│   ├── backend_dev.py
-│   ├── frontend_dev.py
-│   ├── qa_engineer.py
-│   ├── code_reviewer.py
-│   └── documentation.py
-├── graph/             # Pipeline orchestrator
-│   └── pipeline.py
-├── memory/            # Context + Qdrant LTM
-│   ├── context.py
-│   └── long_term.py
-├── tools/             # Search, crawl, output
-│   ├── search.py
-│   ├── crawl.py
-│   └── output.py
-├── triggers/          # File watcher + git hook
-│   ├── watcher.py
-│   └── git_hook.py
-├── integrations/      # Platform configs
-│   ├── opencode.py
-│   ├── claude_code.py
-│   ├── cline.py
-│   ├── roocode.py
-│   └── codex.py
-├── schemas/           # Pydantic v2 outputs
-│   └── outputs.py
-└── utils/             # LLM, retry, files, errors
-    ├── llm.py
-    ├── retry.py
-    ├── files.py
-    └── errors.py
-tests/                 # 74 unit tests
-install.py             # Platform installer
+AI-Dev-Team/
+├── plugin/                # Core package
+│   ├── server.py          # MCP server (entry point)
+│   ├── config.py          # Settings
+│   ├── agents/            # 8 AI agents
+│   ├── graph/             # Pipeline orchestrator
+│   ├── memory/            # Context + Qdrant LTM
+│   ├── tools/             # Search, crawl, output
+│   ├── triggers/          # File watcher + git hook
+│   ├── integrations/      # Platform configs
+│   ├── schemas/           # Pydantic v2 outputs
+│   └── utils/             # LLM, retry, files, errors
+├── tests/                 # Unit tests
+├── docs/                  # Documentation
+├── requirements.txt       # Dependencies
+├── pyproject.toml         # Package config
+└── .env.example           # Environment template
 ```
 
 ## Tech Stack
