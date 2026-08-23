@@ -1,46 +1,27 @@
 # Integration Guide
 
-## Deploy to Horizon (Recommended)
+## Remote (Horizon — Recommended)
 
-Horizon is FastMCP's managed cloud for MCP servers. Free tier available.
+The server is deployed at: `https://ai-dev-team.fastmcp.app/mcp`
 
-### Setup
+### OpenCode
 
-```bash
-pip install fastmcp
-fastmcp auth login
-```
-
-### Deploy
-
-```bash
-cd "C:\Users\ADMIN\Desktop\AI Dev Team"
-fastmcp deploy plugin/server.py --name ai-dev-team
-```
-
-This gives you a public URL like:
-```
-https://ai-dev-team-abc123.prefect.io/mcp
-```
-
-### Connect from OpenCode
-
-Edit `~/.config/opencode/opencode.jsonc`:
+Edit `~/.config/opencode/opencode.json`:
 
 ```json
 {
   "mcp": {
     "ai-dev-team": {
       "type": "remote",
-      "url": "https://ai-dev-team-abc123.prefect.io/mcp"
+      "url": "https://ai-dev-team.fastmcp.app/mcp"
     }
   }
 }
 ```
 
-Restart OpenCode. The tools appear in the tool palette.
+Restart OpenCode. The 11 tools appear in the tool palette.
 
-### Connect from Claude Code
+### Claude Code
 
 Create `.mcp.json` in your project:
 
@@ -49,7 +30,7 @@ Create `.mcp.json` in your project:
   "mcpServers": {
     "ai-dev-team": {
       "type": "remote",
-      "url": "https://ai-dev-team-abc123.prefect.io/mcp"
+      "url": "https://ai-dev-team.fastmcp.app/mcp"
     }
   }
 }
@@ -57,9 +38,9 @@ Create `.mcp.json` in your project:
 
 Restart Claude Code. Type `/mcp` to verify.
 
-### Connect from Cline / Roo Code
+### Cline / Roo Code
 
-Same as Claude Code — add the `.mcp.json` to your project root.
+Same as Claude Code — add `.mcp.json` to your project root.
 
 ---
 
@@ -110,10 +91,10 @@ Get a Groq key at https://console.groq.com (free tier available).
 
 ## Supported Platforms
 
-| Platform | Local | Remote (Horizon) |
-|----------|-------|------------------|
+| Platform | Remote (Horizon) | Local (stdio) |
+|----------|------------------|---------------|
+| OpenCode | `opencode.json` | `opencode.json` |
 | Claude Code | `.mcp.json` | `.mcp.json` |
-| OpenCode | `opencode.jsonc` | `opencode.jsonc` |
 | Cline | `.mcp.json` | `.mcp.json` |
 | Roo Code | `.mcp.json` | `.mcp.json` |
 | Codex CLI | `~/.codex/config.json` | `~/.codex/config.json` |
