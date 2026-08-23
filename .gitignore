@@ -51,3 +51,5 @@ qdrant_storage/
 node_modules/
 
 .waylog/
+
+.waylog/
