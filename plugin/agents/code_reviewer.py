@@ -90,7 +90,7 @@ async def code_reviewer_agent(file_path: str) -> ReviewOutput:
     llm = get_llm(model=settings.REVIEW_MODEL, temperature=0.3, max_tokens=3000)
 
     try:
-        response = invoke_with_retry(llm, [HumanMessage(content=prompt)])
+        response = await invoke_with_retry(llm, [HumanMessage(content=prompt)])
         parsed = _parse_review(response.content)
     except Exception as e:
         log_activity("code_reviewer", "error", {"error": str(e)})

@@ -7,6 +7,7 @@ under `pending_scaffold` so the calling platform/LLM can confirm before writing.
 
 Flow: PM → Architect → (Backend + Frontend) → QA + Review → Docs
 """
+import asyncio
 import logging
 from pathlib import Path
 
@@ -56,13 +57,13 @@ async def run_devteam_pipeline(idea: str) -> dict:
         arch = await architect_agent(pm.functional_requirements)
         results["architect"] = arch.model_dump()
 
-        # 3. Backend + Frontend scaffolds (returned, NOT written)
-        last_stage = "backend_dev"
-        backend = await backend_dev_agent(spec)
+        # 3. Backend + Frontend scaffolds in parallel (returned, NOT written)
+        last_stage = "backend_dev+frontend_dev"
+        backend, frontend = await asyncio.gather(
+            backend_dev_agent(spec),
+            frontend_dev_agent(spec),
+        )
         results["backend_dev"] = backend.model_dump()
-
-        last_stage = "frontend_dev"
-        frontend = await frontend_dev_agent(spec)
         results["frontend_dev"] = frontend.model_dump()
 
         # 4. QA + Review in parallel over the generated backend files

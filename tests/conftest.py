@@ -77,6 +77,9 @@ class FakeLLM:
             return self.schema(**payload)
         return _ContentResponse(self._raw)
 
+    async def ainvoke(self, messages, **kwargs):
+        return self.invoke(messages, **kwargs)
+
 
 class _ContentResponse:
     def __init__(self, content):

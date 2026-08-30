@@ -1,6 +1,6 @@
 """Unit tests for AI Dev Team agents with mocked LLM."""
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 from pathlib import Path
 import tempfile
 import os
@@ -12,23 +12,34 @@ def mock_llm():
     mock = MagicMock()
     mock.with_structured_output.return_value = mock
     mock.invoke = MagicMock()
-    mock.ainvoke = AsyncMock()
+
+    # `invoke_with_retry` prefers `ainvoke`; keep both in sync so tests exercise
+    # the same async path production uses.
+    async def _ainvoke(messages, **kwargs):
+        return mock.invoke(messages, **kwargs)
+
+    mock.ainvoke = _ainvoke
     return mock
 
 
 @pytest.fixture(autouse=True)
 def temp_ai_devteam(tmp_path, monkeypatch):
-    """Create a temp .ai-devteam directory for each test."""
+    """Create a temp .ai-devteam directory for each test, and chdir into tmp_path.
+
+    `monkeypatch.chdir` keeps every agent's CWD-relative writes (e.g. the
+    documentation agent writing README.md at the project root) inside the temp
+    dir — otherwise tests silently write into the real repo.
+    """
     ai_dir = tmp_path / ".ai-devteam"
     ai_dir.mkdir(parents=True, exist_ok=True)
     (ai_dir / "logs").mkdir()
     (ai_dir / "tests").mkdir()
     (ai_dir / "reviews").mkdir()
     (ai_dir / "research").mkdir()
+    monkeypatch.chdir(tmp_path)
 
     # Set up paths - patch project_root so ai_devteam_dir() returns our temp dir
     import plugin.paths as paths_module
-    original_project_root = paths_module.project_root
 
     def mock_project_root():
         return tmp_path
@@ -40,9 +51,6 @@ def temp_ai_devteam(tmp_path, monkeypatch):
     monkeypatch.setattr(output_module, "ai_devteam_dir", lambda: tmp_path / ".ai-devteam")
 
     yield ai_dir
-
-    # Restore
-    monkeypatch.setattr(paths_module, "project_root", original_project_root)
 
 
 class TestProductManagerAgent:

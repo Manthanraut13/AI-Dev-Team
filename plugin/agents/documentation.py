@@ -13,7 +13,7 @@ from plugin.config import settings
 from plugin.memory.context import load_context
 from plugin.memory.long_term import qdrant_upsert
 from plugin.utils.llm import get_llm, invoke_with_retry
-from plugin.utils.files import parse_files
+from plugin.utils.files import parse_files, safe_join
 from plugin.tools.output import log_activity
 import logging
 
@@ -84,7 +84,7 @@ async def documentation_agent(changed_files: list[str]) -> DocsOutput:
     llm = get_llm(model=settings.DOCS_MODEL, temperature=0.3, max_tokens=4000)
 
     try:
-        response = invoke_with_retry(llm, [HumanMessage(content=prompt)])
+        response = await invoke_with_retry(llm, [HumanMessage(content=prompt)])
         parsed = parse_files(response.content)
     except Exception as e:
         log_activity("documentation", "error", {"error": str(e)})
@@ -110,7 +110,8 @@ async def documentation_agent(changed_files: list[str]) -> DocsOutput:
             dest = Path("CHANGELOG.md")
             changelog_entry = content
         else:
-            dest = Path(rel_path)
+            # Untrusted LLM output — never let it escape the project root.
+            dest = Path(safe_join(str(Path.cwd()), rel_path))
             dest.parent.mkdir(parents=True, exist_ok=True)
 
         dest.write_text(content, encoding="utf-8")

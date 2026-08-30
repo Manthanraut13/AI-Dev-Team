@@ -10,6 +10,7 @@ import datetime
 from pathlib import Path
 
 from plugin.paths import ai_devteam_dir, log_file
+from plugin.utils.files import safe_join
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,8 @@ def write_agent_output(agent_name: str, filename: str, content: str) -> Path:
         base = base / subdir
     base.mkdir(parents=True, exist_ok=True)
 
-    path = base / filename
+    # Never let filenames (topic-derived, LLM-derived) escape `.ai-devteam/`.
+    path = Path(safe_join(str(base), filename))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     logger.info(f"Wrote agent output: {path}")

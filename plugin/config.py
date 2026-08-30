@@ -4,7 +4,7 @@ Only plugin-relevant keys are kept (LLM, tracing, search, GitHub, Qdrant).
 Web-app-only fields from v1 (Postgres, Clerk, Supabase, CORS, session dirs)
 were removed in the v2 plugin pivot.
 """
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -48,10 +48,11 @@ class Settings(BaseSettings):
     FAST_MODEL: str = "openai/gpt-oss-20b"
     SUPERVISOR_MODEL: str = "openai/gpt-oss-120b"
 
-    class Config:
-        env_file = [str(p) for p in DOTENV_CANDIDATES if p.exists()]
-        env_file_encoding = "utf-8"
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=[str(p) for p in DOTENV_CANDIDATES if p.exists()],
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 settings = Settings()

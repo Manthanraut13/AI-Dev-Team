@@ -15,6 +15,7 @@ from plugin.tools.search import web_search
 from plugin.tools.crawl import firecrawl_scrape
 from plugin.tools.output import write_agent_output, log_activity
 from plugin.utils.llm import get_llm, invoke_with_retry
+from plugin.utils.files import slugify
 import logging
 
 logger = logging.getLogger(__name__)
@@ -83,12 +84,12 @@ async def research_agent(topic: str) -> ResearchOutput:
     ]
 
     try:
-        result = invoke_with_retry(structured_llm, messages)
+        result = await invoke_with_retry(structured_llm, messages)
     except Exception as e:
         if "validation" in str(e).lower() or "parse" in str(e).lower():
             logger.warning(f"Research output validation failed, retrying: {e}")
             try:
-                result = invoke_with_retry(structured_llm, messages)
+                result = await invoke_with_retry(structured_llm, messages)
             except Exception as e2:
                 log_activity("research", "error", {"error": str(e2)})
                 raise RuntimeError(f"Research agent failed after retry: {e2}") from e2
@@ -104,7 +105,7 @@ async def research_agent(topic: str) -> ResearchOutput:
     )
 
     md = _format_research_md(result)
-    filename = f"{topic.lower().replace(' ', '_')[:80]}.md"
+    filename = f"{slugify(topic)[:80]}.md"
     write_agent_output("research", filename, md)
 
     log_activity("research", "end", {"findings": len(result.key_findings), "links": len(result.useful_links)})

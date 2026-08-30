@@ -64,7 +64,7 @@ async def qa_engineer_agent(file_path: str) -> QAOutput:
     llm = get_llm(temperature=0.3, max_tokens=3000)
 
     try:
-        response = invoke_with_retry(llm, [HumanMessage(content=prompt)])
+        response = await invoke_with_retry(llm, [HumanMessage(content=prompt)])
         parsed = parse_files(response.content, trim_prose=True)
     except Exception as e:
         log_activity("qa_engineer", "error", {"error": str(e)})

@@ -48,12 +48,12 @@ async def product_manager_agent(idea: str) -> PMOutput:
     ]
 
     try:
-        result = invoke_with_retry(structured_llm, messages)
+        result = await invoke_with_retry(structured_llm, messages)
     except Exception as e:
         if "validation" in str(e).lower() or "parse" in str(e).lower():
             logger.warning(f"PM output validation failed, retrying: {e}")
             try:
-                result = invoke_with_retry(structured_llm, messages)
+                result = await invoke_with_retry(structured_llm, messages)
             except Exception as e2:
                 log_activity("product_manager", "error", {"error": str(e2)})
                 raise RuntimeError(f"Product Manager agent failed after retry: {e2}") from e2

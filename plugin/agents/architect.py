@@ -82,13 +82,13 @@ async def architect_agent(requirements: Optional[List[str]] = None) -> Architect
     ]
 
     try:
-        result = invoke_with_retry(structured_llm, messages)
+        result = await invoke_with_retry(structured_llm, messages)
     except Exception as e:
         if "validation" in str(e).lower() or "parse" in str(e).lower():
             # LLM produced malformed output — retry once more with a reminder
             logger.warning(f"Architect output validation failed, retrying: {e}")
             try:
-                result = invoke_with_retry(structured_llm, messages)
+                result = await invoke_with_retry(structured_llm, messages)
             except Exception as e2:
                 log_activity("architect", "error", {"error": str(e2)})
                 raise RuntimeError(f"Architect agent failed after retry: {e2}") from e2

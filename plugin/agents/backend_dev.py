@@ -90,7 +90,7 @@ async def backend_dev_agent(spec: str) -> BackendDevOutput:
 
     llm = get_llm(temperature=0.3, max_tokens=4000)
     try:
-        response = invoke_with_retry(llm, [HumanMessage(content=prompt)])
+        response = await invoke_with_retry(llm, [HumanMessage(content=prompt)])
         files = parse_files(response.content)
     except Exception as e:
         log_activity("backend_dev", "error", {"error": str(e)})

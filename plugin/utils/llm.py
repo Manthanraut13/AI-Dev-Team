@@ -1,9 +1,9 @@
-"""Shared LLM factory + retry invocation (ported from v1 backend)."""
+"""Shared LLM factory + retry invocation."""
+import asyncio
+import logging
+
 from langchain_groq import ChatGroq
 from plugin.config import settings
-from plugin.utils.retry import with_retry
-import time
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +28,25 @@ def get_llm(
     )
 
 
-def invoke_with_retry(llm, messages, max_attempts: int = 4, base_delay: float = 8.0, **kwargs):
-    """Invoke an LLM with exponential backoff on rate limits / transient errors."""
+async def invoke_with_retry(llm, messages, max_attempts: int = 4, base_delay: float = 8.0, **kwargs):
+    """Invoke the LLM with exponential backoff on rate limits / transient errors.
+
+    Async: uses `ainvoke` when available and sleeps with `asyncio.sleep` so the
+    MCP server's event loop is never blocked by a retry backoff (previously a
+    synchronous `time.sleep(8-33s)` stalled every concurrent tool call).
+    """
+    # Prefer the async runnable; fall back to the sync invoke wrapped in a thread.
+    if hasattr(llm, "ainvoke"):
+        call = lambda msgs, **kw: llm.ainvoke(msgs, **kw)
+    elif hasattr(llm, "invoke"):
+        call = lambda msgs, **kw: asyncio.to_thread(lambda: llm.invoke(msgs, **kw))
+    else:
+        raise TypeError(f"Unsupported LLM object: {type(llm)!r}")
+
     delay = base_delay
     for attempt in range(1, max_attempts + 1):
         try:
-            return llm.invoke(messages, **kwargs)
+            return await call(messages, **kwargs)
         except Exception as e:
             msg = str(e)
             is_retryable = (
@@ -50,6 +63,6 @@ def invoke_with_retry(llm, messages, max_attempts: int = 4, base_delay: float = 
             logger.warning(
                 f"LLM retry {attempt}/{max_attempts}: {msg[:120]} (waiting {delay:.0f}s)"
             )
-            time.sleep(delay)
+            await asyncio.sleep(delay)
             delay *= 1.6
-    return llm.invoke(messages, **kwargs)
+    raise RuntimeError("Unreachable: invoke_with_retry exhausted attempts")
